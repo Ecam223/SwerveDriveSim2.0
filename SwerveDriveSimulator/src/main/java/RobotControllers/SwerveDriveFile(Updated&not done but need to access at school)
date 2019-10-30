@@ -1,0 +1,38 @@
+package RobotControllers;
+
+import interfaces.JoysticksInterface;
+import interfaces.RobotController;
+import interfaces.RobotInterface;
+import interfaces.SwerveWheelInterface;
+
+public class SwerveDrive implements RobotController {
+    @Override
+    public void loop(JoysticksInterface joysticks, RobotInterface robot) {
+        double leftX = joysticks.getLeftStick().x;
+        double leftY = joysticks.getLeftStick().y;
+        double vel = Math.sqrt((Math.pow(leftX, 2)) + (Math.pow(leftY, 2))) * 7;
+
+        // assist to allow driving exactly straight
+        /*if(Math.abs(leftPower - rightPower) < 0.5) {
+            leftPower = rightPower;
+        }*/
+
+        for(SwerveWheelInterface wheel : robot.getDrivetrain()) {
+            // make sure the wheels are always facing forward (none of this funny swerve business)
+            wheel.setWheelAngle(0);
+
+            // if the wheel is on the right side of the robot
+            //wheel angle is 29.845
+            if(leftY > 0.001){
+                wheel.setWheelVelocity(vel);
+            }else if(leftY < 0.001 && leftY >= 0){
+                wheel.setWheelVelocity(0);
+            }
+            if(leftY < -0.001){
+                wheel.setWheelVelocity(-vel);
+            }else if(leftY > -0.001 && leftY <= 0){
+                wheel.setWheelVelocity(0);
+            }
+        }
+    }
+}
